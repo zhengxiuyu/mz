@@ -1,0 +1,102 @@
+\documentclass[10pt]{article}
+\usepackage{amsmath}
+
+\title{Some Notes on Position Based Fluids}
+\author{Arno Luebke (arno.luebke@googlemail.com)}
+\date{}
+
+\begin{document}
+\maketitle
+\underline{General}
+\begin{itemize}
+    \item the vector $\bf p$ is a concatenation of particle positions, i.e. 
+        \begin{eqnarray*}
+            {\bf p} = ({\bf p}_1, {\bf p}_2, ..., {\bf p}_N) = (x_1, y_1, z_1,  x_2, y_2, z_2,  ..., x_N, y_N, z_N)
+        \end{eqnarray*}
+    
+    \item similarly,
+        \begin{eqnarray*}
+            {\Delta \bf p} &=& ({\Delta\bf p}_1, {\Delta\bf p}_2, ..., {\Delta\bf p}_N) \\
+            &=& (\Delta x_1, \Delta y_1, \Delta z_1, \Delta x_2, \Delta y_2, \Delta z_2, ..., \Delta x_N, \Delta y_N, \Delta z_N)
+        \end{eqnarray*}
+        
+    \item Equation 4 expands to:
+        \begin{eqnarray*}
+            \begin{pmatrix}
+                \Delta{\bf p}_1 \\
+                \Delta{\bf p}_2 \\
+                \vdots \\
+                \Delta{\bf p}_N
+            \end{pmatrix}
+            &\approx&
+            \left(\nabla C_1({\bf p}); \nabla C_2({\bf p}); \hdots; \nabla C_N({\bf p})\right)
+            \begin{pmatrix}
+                \lambda_1 \\
+                \lambda_2 \\
+                \vdots \\
+                \lambda_N
+            \end{pmatrix}\\
+            &\approx&
+            \begin{pmatrix}
+                \nabla_{{\bf p}_1} C_1({\bf p}) &  \nabla_{{\bf p}_1} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_1} C_N({\bf p}) \\
+                \nabla_{{\bf p}_2} C_1({\bf p}) &  \nabla_{{\bf p}_2} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_2} C_N({\bf p}) \\
+                \vdots & \vdots & & \vdots \\
+                \nabla_{{\bf p}_N} C_1({\bf p})  &  \nabla_{{\bf p}_N} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_N} C_N({\bf p}) \\
+            \end{pmatrix}
+            \begin{pmatrix}
+                \lambda_1 \\
+                \lambda_2 \\
+                \vdots \\
+                \lambda_N
+            \end{pmatrix}\\            
+        \end{eqnarray*}
+        where $\nabla_{{\bf p}_k} C_i({\bf p}) = \partial C_i ({\bf p}) / \partial {\bf p}_k =  (\partial C_i({\bf p}) / \partial x_k, \partial C_i({\bf p}) / \partial y_k, \partial C_i({\bf p}) / \partial z_k)$
+    
+    \item Equation 6 expands to
+        \begin{eqnarray*}
+            \begin{pmatrix}
+                C_1({\bf p}) \\
+                C_2({\bf p}) \\
+                \vdots \\
+                C_N({\bf p})
+            \end{pmatrix}
+            +
+            \begin{pmatrix}
+                \nabla_{{\bf p}_1} C_1({\bf p}) &  \nabla_{{\bf p}_2} C_1({\bf p}) & \hdots  & \nabla_{{\bf p}_N} C_1({\bf p}) \\
+                \nabla_{{\bf p}_1} C_2({\bf p}) &  \nabla_{{\bf p}_2} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_N} C_2({\bf p}) \\
+                \vdots & \vdots & & \vdots \\
+                \nabla_{{\bf p}_1} C_N({\bf p})  &  \nabla_{{\bf p}_2} C_N({\bf p}) & \hdots  & \nabla_{{\bf p}_N} C_N({\bf p}) \\
+            \end{pmatrix} \cdot \\
+            {\vspace{6cm}}
+            \begin{pmatrix}
+                \nabla_{{\bf p}_1} C_1({\bf p}) &  \nabla_{{\bf p}_1} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_1} C_N({\bf p}) \\
+                \nabla_{{\bf p}_2} C_1({\bf p}) &  \nabla_{{\bf p}_2} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_2} C_N({\bf p}) \\
+                \vdots & \vdots & & \vdots \\
+                \nabla_{{\bf p}_N} C_1({\bf p})  &  \nabla_{{\bf p}_N} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_N} C_N({\bf p}) \\
+            \end{pmatrix}
+            \begin{pmatrix}
+                \lambda_1 \\
+                \lambda_2 \\
+                \vdots \\
+                \lambda_N
+            \end{pmatrix}
+            =
+            \begin{pmatrix}
+                0 \\
+                0 \\
+                \vdots \\
+                0
+            \end{pmatrix}          
+        \end{eqnarray*}
+\end{itemize}
+
+\underline{Kernels}
+\begin{itemize}
+    \item \emph{poly6} Kernel (2D)
+        \begin{eqnarray}
+        W_{poly6\_2D}(r, h) = \frac{4}{\pi h^8}\left\{\begin{array}{ll} (h^2 - r^2)^3 & {\rm if\ } r < h \\ 0 & {\rm otherwise}\end{array}\right.
+        \end{eqnarray}
+\end{itemize}
+
+
+\end{document}
