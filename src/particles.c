@@ -14,6 +14,9 @@ mz_particles *mz_particles_new(unsigned int num_particles)
     particles->positions = calloc(num_particles,
         sizeof(*particles->positions));
     checkmem(particles->positions);
+    particles->velocities = calloc(num_particles,
+        sizeof(*particles->velocities));
+    checkmem(particles->velocities);
     particles->constraints = calloc(num_particles,
         sizeof(*particles->constraints));
     checkmem(particles->constraints);
@@ -30,6 +33,7 @@ void mz_particles_delete(mz_particles *particles)
 {
     if (!particles) return;
     free(particles->positions);
+    free(particles->normals);
     free(particles->constraints);
     free(particles->constraint_gradients);
     free(particles);

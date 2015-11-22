@@ -8,6 +8,7 @@ typedef struct {
 
 typedef struct {
     float       rest_density;
+    float       gravity;
     mz_domain   domain;
 } mz_params;
 

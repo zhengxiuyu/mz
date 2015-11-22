@@ -6,6 +6,7 @@
 struct mz_particles {
     mz_grid         *grid;
     float           (*positions)[2];
+    float           (*velocities)[2];
     float           *constraints;
     float           (*constraint_gradients)[2];
     unsigned int    num_particles;
