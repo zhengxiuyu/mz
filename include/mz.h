@@ -8,14 +8,14 @@ enum {
 };
 
 typedef struct {
-    float       min[2];
-    float       max[2];
+    float           min[2];
+    float           max[2];
 } mz_domain;
 
 typedef struct {
-    float       rest_density;
-    float       gravity;
-    mz_domain   domain;
+    float           rest_density;
+    float           gravity;
+    mz_domain       domain;
 } mz_params;
 
 typedef struct {
