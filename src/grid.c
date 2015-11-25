@@ -2,7 +2,7 @@
 #include "common.h"
 
 int mz_init_grid(mz_grid *grid, const mz_particles *particles,
-                 const mz_domain *domain, float dx)
+             const mz_domain *domain, float dx)
 {
     if (!grid  || !particles || dx <= 0.0f) return MZ_INVALID_ARGUMENTS;
     memset(grid, 0, sizeof(mz_grid));
@@ -14,11 +14,11 @@ int mz_init_grid(mz_grid *grid, const mz_particles *particles,
     grid->num_cells[1] = ceil(grid->extent[1] / dx);
     grid->num_cells_total = grid->num_cells[0] * grid->num_cells[1];
     grid->num_faces = calloc(grid->num_cells_total, sizeof(unsigned int));
-    checkmem(grid->num_faces);
+    mz_checkmem(grid->num_faces);
     grid->start_ids = calloc(grid->num_cells_total, sizeof(unsigned int));
-    checkmem(grid->start_ids);
+    mz_checkmem(grid->start_ids);
     grid->ids = calloc(particles->num_particles, sizeof(unsigned int));
-    checkmem(grid->ids);
+    mz_checkmem(grid->ids);
     return MZ_SUCCESS;
 
 error:
@@ -48,5 +48,21 @@ int mz_update_grid(mz_grid *grid, const mz_particles *particles)
         grid->start_ids[i] = -1;
     /* TODO : The rest ... */
     return MZ_SUCCESS;
+}
+
+void mz_grid_coord_from_position(const mz_grid *grid, int coordinate[2],
+                                 const float position[2])
+{
+    coordinate[0] = (position[0] - grid->domain.min[0]) / grid->dx;
+    coordinate[1] = (position[1] - grid->domain.min[1]) / grid->dx;
+    coordinate[0] = mz_clamp(coordinate[0], 0, grid->num_cells[0] - 1);
+    coordinate[1] = mz_clamp(coordinate[1], 0, grid->num_cells[1] - 1);
+}
+
+int mz_grid_index_from_position(const mz_grid *grid, float position[2])
+{
+    int coord[2];
+    mz_grid_coord_from_position(grid, coord, position);
+    return mz_grid_index_from_coord(grid, coord);
 }
 

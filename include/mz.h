@@ -52,6 +52,11 @@ int mz_init_grid(mz_grid *grid, const mz_particles *particles,
                  const mz_domain *domain, float dx);
 void mz_deinit_grid(mz_grid *grid);
 int mz_update_grid(mz_grid *grid, const mz_particles *particles);
+void mz_grid_coord_from_position(const mz_grid *grid, int coord[2],
+                                 const float position[2]);
+#define mz_grid_index_from_coord(grid, coord)                                   \
+    (coord)[0] * (grid)->num_cells[0] + (coord)[1]
+int mz_grid_index_from_position(const mz_grid *grid, float position[2]);
 
 
 #endif /* end of include guard: PARTICLES_H */
