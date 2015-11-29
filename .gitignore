@@ -9,3 +9,4 @@ test/
 *.swp
 *.synctex.gz
 *.DS_Store
+*.dSYM

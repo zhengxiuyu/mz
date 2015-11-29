@@ -8,13 +8,11 @@ int mz_init_grid(mz_grid *grid, const mz_particles *particles,
     memset(grid, 0, sizeof(mz_grid));
     grid->domain = *domain;
     grid->dx = dx;
-    grid->extent[0] = domain->max[0] - domain->min[0];
-    grid->extent[1] = domain->max[1] - domain->min[1];
-    grid->num_cells[0] = ceil(grid->extent[0] / dx);
-    grid->num_cells[1] = ceil(grid->extent[1] / dx);
+    grid->num_cells[0] = ceil(domain->extent[0] / dx);
+    grid->num_cells[1] = ceil(domain->extent[1] / dx);
     grid->num_cells_total = grid->num_cells[0] * grid->num_cells[1];
-    grid->num_faces = calloc(grid->num_cells_total, sizeof(unsigned int));
-    mz_checkmem(grid->num_faces);
+    grid->num_particles = calloc(grid->num_cells_total, sizeof(unsigned int));
+    mz_checkmem(grid->num_particles);
     grid->start_ids = calloc(grid->num_cells_total, sizeof(unsigned int));
     mz_checkmem(grid->start_ids);
     grid->ids = calloc(particles->num_particles, sizeof(unsigned int));
@@ -28,7 +26,7 @@ error:
 
 void mz_deinit_grid(mz_grid *grid)
 {
-    free(grid->num_faces);
+    free(grid->num_particles);
     free(grid->start_ids);
     free(grid->ids);
     memset(grid, 0, sizeof(mz_grid));
@@ -37,16 +35,37 @@ void mz_deinit_grid(mz_grid *grid)
 int mz_update_grid(mz_grid *grid, const mz_particles *particles)
 {
     size_t size;
-    unsigned int i;
+    unsigned int i, a, b;
+    int index;
 
     if (!grid || !particles) return MZ_INVALID_ARGUMENTS;
 
     /* reset per cell data */
     size = grid->num_cells_total * sizeof(unsigned int);
-    memset(grid->num_cells, 0, size);
+    memset(grid->num_particles, 0, size);
     for (i = 0; i < grid->num_cells_total; i++)
         grid->start_ids[i] = -1;
-    /* TODO : The rest ... */
+
+    /* count # of particles for each cell */
+    for (i = 0; i < particles->num_particles; i++) {
+        index = mz_grid_index_from_position(grid, particles->positions[i]);
+        grid->num_particles[index]++;
+    }
+
+    /* compute start ids */
+    grid->start_ids[0] = 0;
+    for (i = 1; i < grid->num_cells_total; i++)
+        grid->start_ids[i] = grid->start_ids[i - 1] + grid->num_particles[i - 1];
+
+    /* store particles ids */
+    memset(grid->num_particles, 0, size);
+    for (i = 0; i < particles->num_particles; i++) {
+        index = mz_grid_index_from_position(grid, particles->positions[i]);
+        a = grid->start_ids[index];
+        b = grid->num_particles[index];
+        grid->ids[a + b] = i;
+        grid->num_particles[index]++;
+    }
     return MZ_SUCCESS;
 }
 

@@ -10,7 +10,11 @@ enum {
 typedef struct {
     float           min[2];
     float           max[2];
+    float           extent[2];
 } mz_domain;
+
+int mz_make_domain(mz_domain *domain, float xmin, float ymin,
+                   float xmax, float ymax);
 
 typedef struct {
     float           rest_density;
@@ -23,7 +27,7 @@ typedef struct {
     float           (*velocities)[2];
     float           (*constraints);
     float           (*constraint_gradients)[2];
-    unsigned int    num_particles;
+    int             num_particles;
 } mz_particles;
 
 int mz_init_particles(mz_particles *particles, unsigned int num_particles);
@@ -37,14 +41,13 @@ void mz_deinit_particles(mz_particles *particles);
  */
 typedef struct {
     mz_domain       domain;
-    float           extent[2];
     float           dx;
-    unsigned int    num_cells_total;
-    unsigned int    num_cells[2];
-    unsigned int    *num_faces;         /* # faces for each cell. */
-    unsigned int    *start_ids;         /* reference to the first particle id
+    int             num_cells_total;
+    int             num_cells[2];
+    int             *num_particles;     /* # particles for each cell. */
+    int             *start_ids;         /* reference to the first particle id
                                            for each cell in [ids]. */
-    unsigned int    *ids;               /* particle ids for referencing particles
+    int             *ids;               /* particle ids for referencing particles
                                            within a cell */
 } mz_grid;
 
@@ -58,5 +61,7 @@ void mz_grid_coord_from_position(const mz_grid *grid, int coord[2],
     (coord)[0] * (grid)->num_cells[0] + (coord)[1]
 int mz_grid_index_from_position(const mz_grid *grid, float position[2]);
 
+int mz_enforce_incompressibility(mz_particles *particles, const mz_grid *grid,
+                                 float rest_density, float support);
 
 #endif /* end of include guard: PARTICLES_H */
