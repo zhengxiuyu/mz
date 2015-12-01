@@ -24,6 +24,7 @@
 #define mz_min(a, b) (a) < (b) ? (a) : (b)
 #define mz_max(a, b) (a) > (b) ? (a) : (b)
 #define mz_clamp(x, a, b) mz_min((b), mz_max((x), (a)))
+#define mz_inrange(x, a, b) ((x) >= (a) && (x) <= (b))
 
 #define mz_set(v, a, b)                                                         \
     (v)[0] = (a);                                                               \

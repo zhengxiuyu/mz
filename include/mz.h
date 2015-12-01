@@ -1,6 +1,8 @@
 #ifndef MZ_H
 #define MZ_H
 
+#include <stdbool.h>
+
 enum {
     MZ_SUCCESS              = 0,
     MZ_OUT_OF_MEMORY,
@@ -25,8 +27,8 @@ typedef struct {
 typedef struct {
     float           (*positions)[2];
     float           (*velocities)[2];
-    float           (*constraints);
-    float           (*constraint_gradients)[2];
+    float           *lambdas;               /* step sizes        */
+    float           *dpositions[2];         /* positions updates */
     int             num_particles;
 } mz_particles;
 
@@ -51,15 +53,33 @@ typedef struct {
                                            within a cell */
 } mz_grid;
 
-int mz_init_grid(mz_grid *grid, const mz_particles *particles,
-                 const mz_domain *domain, float dx);
-void mz_deinit_grid(mz_grid *grid);
-int mz_update_grid(mz_grid *grid, const mz_particles *particles);
-void mz_grid_coord_from_position(const mz_grid *grid, int coord[2],
-                                 const float position[2]);
 #define mz_grid_index_from_coord(grid, coord)                                   \
     (coord)[0] * (grid)->num_cells[0] + (coord)[1]
-int mz_grid_index_from_position(const mz_grid *grid, float position[2]);
+
+extern int
+mz_init_grid(mz_grid *grid, const mz_particles *particles,
+             const mz_domain *domain, float dx);
+extern void
+mz_deinit_grid(mz_grid *grid);
+extern int
+mz_update_grid(mz_grid *grid, const mz_particles *particles);
+
+/*
+ * Computes the grid coordinate of the cell containing [position] and stores
+ * it in [coord]. Returns false if the position is outside the grid, otherwise
+ * true.
+ */
+extern bool
+mz_grid_coord_from_position(const mz_grid *grid, int coord[2],
+                            const float position[2]);
+
+/*
+ * Computes the cell index for the cell containing [position] and stores it in
+ * [index]. Returns false if the position is outside the grid, otherwise true.
+ */
+extern bool
+mz_grid_index_from_position(const mz_grid *grid, int *index,
+                            float position[2]);
 
 int mz_enforce_incompressibility(mz_particles *particles, const mz_grid *grid,
                                  float rest_density, float support);
