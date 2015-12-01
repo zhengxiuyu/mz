@@ -20,8 +20,9 @@ typedef struct {
     float (*velocities)[2];
     float *lambdas;                                     /* step sizes        */
     float *dpositions[2];                               /* positions updates */
-#ifdef
+#ifdef MZ_STORE_DENSITIES
     float *densities;
+#endif
     int num_particles;
 } mz_particles;
 
@@ -59,7 +60,7 @@ int mz_init_particles(mz_particles *particles, unsigned int num_particles);
 void mz_deinit_particles(mz_particles *particles);
 
 int mz_init_grid(
-	mz_grid *grid,
+    mz_grid *grid,
     const mz_particles *particles,
     const mz_domain *domain,
     float dx
