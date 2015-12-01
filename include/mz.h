@@ -45,7 +45,7 @@ typedef struct {
 } mz_grid;
 
 int mz_make_domain(
-	mz_domain *domain,
+    mz_domain *domain,
     float xmin,
     float ymin,
     float xmax,
@@ -74,7 +74,7 @@ void mz_deinit_grid(mz_grid *grid);
  * true.
  */
 bool mz_grid_coord_from_position(
-	const mz_grid *grid,
+    const mz_grid *grid,
     int coord[2],
     const float position[2]
 );
@@ -84,12 +84,12 @@ bool mz_grid_coord_from_position(
  * [index]. Returns false if the position is outside the grid, otherwise true.
  */
 bool mz_grid_index_from_position(
-	const mz_grid *grid,
+    const mz_grid *grid,
     int *index,
-	float position[2]);
-
+    float position[2]
+);
 int mz_enforce_incompressibility(
-	mz_particles *particles,
+    mz_particles *particles,
     const mz_grid *grid,
     float rest_density,
     float support
