@@ -1,101 +1,66 @@
-\documentclass[10pt]{article}
+\documentclass[8pt]{article}
 \usepackage{amsmath}
 
-\title{Some Notes on Position Based Fluids}
-\author{Arno Luebke (arno.luebke@googlemail.com)}
+\title{\sf Some Notes on Position Based Fluids}
+\author{\small Arno Luebke (arno.luebke@googlemail.com)}
 \date{}
 
 \begin{document}
 \maketitle
-\underline{General}
+\underline{Disclaimer}: This document is probably full of mistakes. Do not blindly trust any statement here.
+
+\section*{\sf Some notes on kernels}
 \begin{itemize}
-    \item the vector $\bf p$ is a concatenation of particle positions, i.e. 
-        \begin{eqnarray*}
-            {\bf p} = ({\bf p}_1, {\bf p}_2, ..., {\bf p}_N) = (x_1, y_1, z_1,  x_2, y_2, z_2,  ..., x_N, y_N, z_N)
-        \end{eqnarray*}
-    
-    \item similarly,
-        \begin{eqnarray*}
-            {\Delta \bf p} &=& ({\Delta\bf p}_1, {\Delta\bf p}_2, ..., {\Delta\bf p}_N) \\
-            &=& (\Delta x_1, \Delta y_1, \Delta z_1, \Delta x_2, \Delta y_2, \Delta z_2, ..., \Delta x_N, \Delta y_N, \Delta z_N)
-        \end{eqnarray*}
-        
-    \item Equation 4 expands to:
-        \begin{eqnarray*}
-            \begin{pmatrix}
-                \Delta{\bf p}_1 \\
-                \Delta{\bf p}_2 \\
-                \vdots \\
-                \Delta{\bf p}_N
-            \end{pmatrix}
-            &\approx&
-            \left(\nabla C_1({\bf p}); \nabla C_2({\bf p}); \hdots; \nabla C_N({\bf p})\right)
-            \begin{pmatrix}
-                \lambda_1 \\
-                \lambda_2 \\
-                \vdots \\
-                \lambda_N
-            \end{pmatrix}\\
-            &\approx&
-            \begin{pmatrix}
-                \nabla_{{\bf p}_1} C_1({\bf p}) &  \nabla_{{\bf p}_1} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_1} C_N({\bf p}) \\
-                \nabla_{{\bf p}_2} C_1({\bf p}) &  \nabla_{{\bf p}_2} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_2} C_N({\bf p}) \\
-                \vdots & \vdots & & \vdots \\
-                \nabla_{{\bf p}_N} C_1({\bf p})  &  \nabla_{{\bf p}_N} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_N} C_N({\bf p}) \\
-            \end{pmatrix}
-            \begin{pmatrix}
-                \lambda_1 \\
-                \lambda_2 \\
-                \vdots \\
-                \lambda_N
-            \end{pmatrix}\\            
-        \end{eqnarray*}
-        where $\nabla_{{\bf p}_k} C_i({\bf p}) = \partial C_i ({\bf p}) / \partial {\bf p}_k =  (\partial C_i({\bf p}) / \partial x_k, \partial C_i({\bf p}) / \partial y_k, \partial C_i({\bf p}) / \partial z_k)$
-    
-    \item Equation 6 expands to
-        \begin{eqnarray*}
-            \begin{pmatrix}
-                C_1({\bf p}) \\
-                C_2({\bf p}) \\
-                \vdots \\
-                C_N({\bf p})
-            \end{pmatrix}
-            +
-            \begin{pmatrix}
-                \nabla_{{\bf p}_1} C_1({\bf p}) &  \nabla_{{\bf p}_2} C_1({\bf p}) & \hdots  & \nabla_{{\bf p}_N} C_1({\bf p}) \\
-                \nabla_{{\bf p}_1} C_2({\bf p}) &  \nabla_{{\bf p}_2} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_N} C_2({\bf p}) \\
-                \vdots & \vdots & & \vdots \\
-                \nabla_{{\bf p}_1} C_N({\bf p})  &  \nabla_{{\bf p}_2} C_N({\bf p}) & \hdots  & \nabla_{{\bf p}_N} C_N({\bf p}) \\
-            \end{pmatrix} \cdot \\
-            {\vspace{6cm}}
-            \begin{pmatrix}
-                \nabla_{{\bf p}_1} C_1({\bf p}) &  \nabla_{{\bf p}_1} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_1} C_N({\bf p}) \\
-                \nabla_{{\bf p}_2} C_1({\bf p}) &  \nabla_{{\bf p}_2} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_2} C_N({\bf p}) \\
-                \vdots & \vdots & & \vdots \\
-                \nabla_{{\bf p}_N} C_1({\bf p})  &  \nabla_{{\bf p}_N} C_2({\bf p}) & \hdots  & \nabla_{{\bf p}_N} C_N({\bf p}) \\
-            \end{pmatrix}
-            \begin{pmatrix}
-                \lambda_1 \\
-                \lambda_2 \\
-                \vdots \\
-                \lambda_N
-            \end{pmatrix}
-            =
-            \begin{pmatrix}
-                0 \\
-                0 \\
-                \vdots \\
-                0
-            \end{pmatrix}          
-        \end{eqnarray*}
+  \item Kernels approximate the delta function
+  \item $W(\vec{p}_i - \vec{p}_j, h)$ can be written more briefly as $W^h_{ij}$
+  \item Kernels are symmetric, i.e. $W^h_{ij} = W^h_{ij}$
 \end{itemize}
 
-\underline{Kernels}
+\section*{\sf The constraint gradient}
+The constraint gradient can be derived as follows:
+\begin{eqnarray}
+\nabla_{\vec{p}_k}C_i = \nabla_{\vec{p}_k}\left(\frac{\rho_i}{\rho_0} - 1\right)=\frac{1}{\rho_0} \nabla_{\vec{p}_k}\rho_i =\frac{1}{\rho_0} \nabla_{\vec{p}_k}\sum_jW^h_{ij}=\frac{1}{\rho_0} \sum_j\nabla_{\vec{p}_k}W^h_{ij}.
+\end{eqnarray}
+Expanding the sum gives
+\begin{eqnarray}
+\nabla_{\vec{p}_k}C_i = \frac{1}{\rho_0}\left(\nabla_{\vec{p}_k}W^h_{i1} + \nabla_{\vec{p}_k}W^h_{i2} + ... + \nabla_{\vec{p}_k}W^h_{ik} + ... + \nabla_{\vec{p}_k}W^h_{iN}\right)
+\end{eqnarray}
+We note that if $k\neq i$, all terms except for $\nabla_{\vec{p}_k}W^h_{ik}$ vanish as they do not depend on $\vec{p}_k$. However, if $k = i$, all terms depend of $\vec{p}_k$. Hence,
+\begin{eqnarray}
+\nabla_{\vec{p}_k}C_i =\frac{1}{\rho}_0 \left\{\begin{array}{ll}
+\sum_j \nabla_{\vec{p}_k}W^h_{ij}& {\rm if \ } k = i \\[0.25cm]
+\nabla_{\vec{p}_k}W^h_{ik} & {\rm otherwise}
+\end{array}\right. .
+\end{eqnarray}
+Note: This equation differs from Equation 8 in the original paper in that a minus sign for the second condition is missing. In my opinion this makes more sense when deriving the total position update.
+
+
+
+\section*{\sf The total position update for particle $i$ : $\Delta \vec{p}_i$}
+Applying the Newton step for each constraint function leads to:
+\begin{eqnarray}
+  \Delta \vec{p}_i = \lambda_1\nabla_{\vec{p}_i}C_1 + \lambda_2\nabla_{\vec{p}_i}C_2 + ... +\lambda_i\nabla_{\vec{p}_i}C_i + ... +\lambda_N\nabla_{\vec{p}_i}C_N.
+\end{eqnarray}
+Given the definition of $\nabla_{\vec{p}_k}C_i$ this gives
+\begin{eqnarray*}
+  \Delta \vec{p}_i &=& \frac{1}{\rho_0}\left(\lambda_1\nabla_{\vec{p}_i}W^h_{1i} + \lambda_2\nabla_{\vec{p}_i}W^h_{2i} + ... + \lambda_i\sum_{k\neq i}\nabla_{\vec{p}_i}W^h_{ik} + ... + \lambda_N\nabla_{\vec{p}_i}W^h_{Ni}\right)\\
+  &=& \frac{1}{\rho_0}{\Big(}\lambda_1\nabla_{\vec{p}_i}W^h_{1i} + \lambda_2\nabla_{\vec{p}_i}W^h_{2i} + ... + (\lambda_i\nabla_{\vec{p}_i}W^h_{i1} + \lambda_i\nabla_{\vec{p}_i}W^h_{i2} +  ... \\
+  && \quad \quad \quad + \lambda_i\nabla_{\vec{p}_i}W^h_{iN} )... + \lambda_N\nabla_{\vec{p}_i}W^h_{Ni}{\Big).}
+\end{eqnarray*}
+Due to kernel symmetry terms pair up as follows
+\begin{eqnarray*}
+   \Delta \vec{p}_i &=& \frac{1}{\rho_0}\Big((\lambda_i + \lambda_1)\nabla_{\vec{p}_i}W^h_{i1} + (\lambda_i + \lambda_2)\nabla_{\vec{p}_i}W^h_{i2} + ... + (\lambda_i + \lambda_N)\nabla_{\vec{p}_i}W^h_{iN}\Big)\\
+           &=& \sum_j(\lambda_i + \lambda_j)\nabla_{\vec{p}_i}W^h_{ij}
+\end{eqnarray*}
+The sum above is over all particles. However, since $\nabla_{\vec{p}_i}W^h_{ij} = \vec{0}$ if particle $i$ and $j$ are not neighbors, implementations just sum over the neighbors of particle $i$. 
+
+
+\section*{\sf{Kernels}}
 \begin{itemize}
     \item In two dimensions: given an unnormalized kernel $W'(r, h)$. $W'(r, h)$ is normalized by $2\pi\int_{r=0}^h r W'(r, h) dr$.
     \item \emph{poly6} Kernel (2D)
         \begin{eqnarray}
-        W_{poly6\_2D}(r, h) = \frac{4}{\pi h^8}\left\{\begin{array}{ll} (h^2 - r^2)^3 & {\rm if\ } r < h \\ 0 & {\rm otherwise}\end{array}\right.
+        W_{poly6\_2D}(r, h) &=& \frac{4}{\pi h^8}\left\{\begin{array}{ll} (h^2 - r^2)^3 & {\rm if\ } r < h \\ 0 & {\rm otherwise}\end{array}\right.
         \end{eqnarray}
 \end{itemize}
 
