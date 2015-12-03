@@ -1,9 +1,13 @@
 #include <mz.h>
 #include "common.h"
 
-int mz_make_domain(mz_domain *domain, float xmin, float ymin,
-                   float xmax, float ymax)
-{
+int mz_make_domain(
+    mz_domain *domain,
+    float xmin,
+    float ymin,
+    float xmax,
+    float ymax
+) {
     if (!domain || xmin > xmax || ymin > ymax) {
         mz_debug("Invalid domain arguments\n");
         return MZ_INVALID_ARGUMENTS;

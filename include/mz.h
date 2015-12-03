@@ -18,8 +18,8 @@ typedef struct {
 typedef struct {
     float (*positions)[2];
     float (*velocities)[2];
-    float *lambdas;                                     /* step sizes        */
-    float *dpositions[2];                               /* positions updates */
+    float *lambdas;                                      /* step sizes          */
+    float (*dpositions)[2];                              /* positions updates   */
 #ifdef MZ_STORE_DENSITIES
     float *densities;
 #endif
@@ -37,14 +37,14 @@ typedef struct {
     float dx;
     int num_cells_total;
     int num_cells[2];
-    int *num_particles;                 /* # particles for each cell.         */
+    int *num_particles;                 /* # particles for each cell.           */
     int *start_ids;                     /* reference to the first particle id
-                                           for each cell in [ids].            */
+                                           for each cell in [ids].              */
     int *ids;                           /* particle ids for referencing
-                                           particles within a cell            */
+                                           particles within a cell              */
 } mz_grid;
 
-int mz_make_domain(
+extern int mz_make_domain(
     mz_domain *domain,
     float xmin,
     float ymin,
@@ -52,28 +52,30 @@ int mz_make_domain(
     float ymax
 );
 
-
 #define mz_grid_index_from_coord(grid, coord)                                  \
     (coord)[0] * (grid)->num_cells[0] + (coord)[1]
 
-int mz_init_particles(mz_particles *particles, unsigned int num_particles);
-void mz_deinit_particles(mz_particles *particles);
+extern int mz_init_particles(
+    mz_particles *particles,
+    unsigned int num_particles
+);
+extern void mz_deinit_particles(mz_particles *particles);
 
-int mz_init_grid(
+extern int mz_init_grid(
     mz_grid *grid,
     const mz_particles *particles,
     const mz_domain *domain,
     float dx
 );
-int mz_update_grid(mz_grid *grid, const mz_particles *particles);
-void mz_deinit_grid(mz_grid *grid);
+extern int mz_update_grid(mz_grid *grid, const mz_particles *particles);
+extern void mz_deinit_grid(mz_grid *grid);
 
 /*
  * Computes the grid coordinate of the cell containing [position] and stores
  * it in [coord]. Returns false if the position is outside the grid, otherwise
  * true.
  */
-bool mz_grid_coord_from_position(
+extern bool mz_grid_coord_from_position(
     const mz_grid *grid,
     int coord[2],
     const float position[2]
@@ -83,12 +85,13 @@ bool mz_grid_coord_from_position(
  * Computes the cell index for the cell containing [position] and stores it in
  * [index]. Returns false if the position is outside the grid, otherwise true.
  */
-bool mz_grid_index_from_position(
+extern bool mz_grid_index_from_position(
     const mz_grid *grid,
     int *index,
     float position[2]
 );
-int mz_enforce_incompressibility(
+
+extern int mz_enforce_incompressibility(
     mz_particles *particles,
     const mz_grid *grid,
     float rest_density,

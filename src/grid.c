@@ -1,11 +1,14 @@
 #include <mz.h>
 #include "common.h"
 
-int
-mz_init_grid(mz_grid *grid, const mz_particles *particles,
-             const mz_domain *domain, float dx)
-{
-    if (!grid  || !particles || dx <= 0.0f) return MZ_INVALID_ARGUMENTS;
+int mz_init_grid(
+    mz_grid *grid,
+    const mz_particles *particles,
+    const mz_domain *domain,
+    float dx
+) {
+    if (!grid  || !particles || dx <= 0.0f)
+        return MZ_INVALID_ARGUMENTS;
     memset(grid, 0, sizeof(mz_grid));
     grid->domain = *domain;
     grid->dx = dx;
@@ -21,27 +24,24 @@ mz_init_grid(mz_grid *grid, const mz_particles *particles,
     return MZ_SUCCESS;
 
 error:
-    mz_deinit_grid(grid);
-    return MZ_OUT_OF_MEMORY;
+  mz_deinit_grid(grid);
+  return MZ_OUT_OF_MEMORY;
 }
 
-void
-mz_deinit_grid(mz_grid *grid)
-{
+void mz_deinit_grid(mz_grid *grid) {
     free(grid->num_particles);
     free(grid->start_ids);
     free(grid->ids);
     memset(grid, 0, sizeof(mz_grid));
 }
 
-int
-mz_update_grid(mz_grid *grid, const mz_particles *particles)
-{
+int mz_update_grid(mz_grid *grid, const mz_particles *particles) {
     size_t size;
     unsigned int i, a, b;
     int index;
 
-    if (!grid || !particles) return MZ_INVALID_ARGUMENTS;
+    if (!grid || !particles)
+        return MZ_INVALID_ARGUMENTS;
 
     /* reset per cell data */
     size = grid->num_cells_total * sizeof(unsigned int);
@@ -75,10 +75,11 @@ mz_update_grid(mz_grid *grid, const mz_particles *particles)
     return MZ_SUCCESS;
 }
 
-bool
-mz_grid_coord_from_position(const mz_grid *grid, int coordinate[2],
-                            const float position[2])
-{
+bool mz_grid_coord_from_position(
+    const mz_grid *grid,
+    int coordinate[2],
+    const float position[2]
+) {
     coordinate[0] = (position[0] - grid->domain.min[0]) / grid->dx;
     coordinate[1] = (position[1] - grid->domain.min[1]) / grid->dx;
     if (coordinate[0] < 0 || coordinate[0] >= grid->num_cells[0] ||
@@ -87,9 +88,11 @@ mz_grid_coord_from_position(const mz_grid *grid, int coordinate[2],
     return true;
 }
 
-bool
-mz_grid_index_from_position(const mz_grid *grid, int *index, float position[2])
-{
+bool mz_grid_index_from_position(
+    const mz_grid *grid,
+    int *index,
+    float position[2]
+) {
     int coord[2];
     if (!mz_grid_coord_from_position(grid, coord, position))
         return false;

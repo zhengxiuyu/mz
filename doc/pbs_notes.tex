@@ -62,6 +62,11 @@ The sum above is over all particles. However, since $\nabla_{\vec{p}_i}W^h_{ij} 
         \begin{eqnarray}
         W_{poly6\_2D}(r, h) &=& \frac{4}{\pi h^8}\left\{\begin{array}{ll} (h^2 - r^2)^3 & {\rm if\ } r < h \\ 0 & {\rm otherwise}\end{array}\right.
         \end{eqnarray}
+    \item \emph{spiky} Kernel (2D)
+        \begin{eqnarray}
+            W(\vec{x}, h) &=& \frac{10}{\pi h^5}(h - \Vert\vec{x}\Vert)^3 \\
+            \nabla W(\vec{x}, h) &=& -\frac{30}{\pi h^5}(h - \Vert\vec{x}\Vert)^2\frac{\vec{x}}{\Vert\vec{x}\Vert}
+        \end{eqnarray}
 \end{itemize}
 
 
