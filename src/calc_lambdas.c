@@ -3,6 +3,10 @@
 
 #define EPS 0.0001
 
+#define is_vald_coord(grid, coord)                                            \
+    (mz_inrange((coord)[0], 0, (grid)->num_cells[0] - 1) &&                   \
+        mz_inrange((coord)[1], 0, (grid)->num_cells[1] - 1))
+
 static float eval_poly6(float r, float h) {
     const float c = 4.0 / M_PI;
     float h2 = h * h;
@@ -24,28 +28,37 @@ static float eval_spiky_grad(float r, float h) {
  */
 static void calc_quantities_cell(
     mz_particles *particles,
+    int particle_index,
     const mz_grid *grid,
-    int index,                      /* cell index                            */
+    int cell_index,
     float *density,                 /* [out] updated density                 */
-    float gradient[2],              /* [out] updated constraint gradient     */
+    float *mag_gradient,            /* [out] updated constraint gradient     */
     const float position[2],
     float support
 ) {
-    int i = grid->start_ids[index];
-    int end = i + grid->num_particles[index];
-    int id;
-    float dot, diff[2], r, w, wg;
+    int i = grid->start_ids[cell_index];
+    int imax = i + grid->num_particles[cell_index];
 
-    for (; i < end; i++) {
-        id = grid->ids[i];
-        mz_sub(diff, position, particles->positions[id]);
+    for (; i < imax; i++) {
+        int k = grid->ids[i];
+        float dot, diff[2], r, w;;
+
+        mz_sub(diff, position, particles->positions[k]);
         dot = mz_dot(diff, diff);
         if (dot > support * support)
             continue;
         r = sqrtf(dot);
         w = eval_poly6(r, support);
         *density += w;
+        
         /* eval gradient */
+        if (k == particle_index) {
+            float spiky = eval_spiky_grad(r, support);
+            gradient[0] += spiky * diff[0];
+            gradient[1] += spiky * diff[1];
+        } else {
+
+        }
     }
 }
 
@@ -73,15 +86,15 @@ int mz_calc_lambdas(
         for (cc[0] = cp[0] - 1; cc[0] <= cp[0] + 1; cc[0]++) {
             for (cc[1] = cp[1] - 1; cc[1] <= cp[1] + 1; cc[1]++) {
                 index = mz_grid_index_from_coord(grid, cc);
-                if (!mz_inrange(cc[0], 0, grid->num_cells[0] - 1) ||
-                    !mz_inrange(cc[1], 0, grid->num_cells[1] - 1))
+                if (!is_vald_coord(grid, cc))
                     continue;
-                calc_quantities_cell(particles, grid, index, &dens, grad,
+                calc_quantities_cell(particles, i, grid, index, &dens, grad,
                     particles->positions[i], support);
             }
         }
-
+        dens = dens / rest_density - 1.0;
     }
     return MZ_SUCCESS;
 }
+
 

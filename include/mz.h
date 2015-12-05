@@ -91,8 +91,8 @@ extern bool mz_grid_index_from_position(
     float position[2]
 );
 
-extern int mz_enforce_incompressibility(
-    mz_particles *particles,
+extern int mz_calc_lambdas(
+    mz_particles *particles, 
     const mz_grid *grid,
     float rest_density,
     float support
