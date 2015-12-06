@@ -23,16 +23,14 @@ static float eval_spiky_grad(float r, float h) {
     return c / (h5 * r) * b * b;
 }
 
-/*
- * Update the density and constraint gradient from particles within a grid cell.
- */
 static void calc_quantities_cell(
     mz_particles *particles,
     int particle_index,
     const mz_grid *grid,
     int cell_index,
-    float *density,                 /* [out] updated density                 */
-    float *mag_gradient,            /* [out] updated constraint gradient     */
+    float *dens,
+    float *grad_a,
+    float grad_b[2],
     const float position[2],
     float support
 ) {
@@ -47,17 +45,19 @@ static void calc_quantities_cell(
         dot = mz_dot(diff, diff);
         if (dot > support * support)
             continue;
+
         r = sqrtf(dot);
         w = eval_poly6(r, support);
-        *density += w;
+        *dens += w;
         
-        /* eval gradient */
-        if (k == particle_index) {
+        if (k != particle_index) {
             float spiky = eval_spiky_grad(r, support);
-            gradient[0] += spiky * diff[0];
-            gradient[1] += spiky * diff[1];
-        } else {
-
+            float grad[2];
+            grad[0] = spiky * diff[0];
+            grad[1] = spiky * diff[1];
+            grad_b[0] += grad[0];
+            grad_b[1] += grad[1];
+            *grad_a = mz_dot(grad, grad);
         }
     }
 }
@@ -69,10 +69,9 @@ int mz_calc_lambdas(
     float support
 ) {
     int i = 0;
-    int cp[2], cc[2];                           /* grid coordinates          */
-    int index;                                  /* particle index            */
-    float dens = 0.0;                           /* density for particle i    */
-    float grad[2];                              /* constraint gradient       */
+    int cp[2], cc[2];              /* grid coordinates for particle and cell */
+    int index;                     /* particle index                         */
+    float rho2 = rest_density * rest_density;
 
     if (support != grid->dx) {
         mz_debug("Expected support to equal grid spacing");
@@ -80,19 +79,22 @@ int mz_calc_lambdas(
     }
 
     for (i = 0; i < particles->num_particles; i++) {
-        dens = 0.0;
-        memset(grad, 0, sizeof(float[2]));
+        float nom = 0.0;                        /* density for particle i    */
+        float denoma = 0.0, denomb[2];          /* */
+
+        memset(denomb, 0, sizeof(float[2]));
         mz_grid_coord_from_position(grid, cp, particles->positions[i]);
         for (cc[0] = cp[0] - 1; cc[0] <= cp[0] + 1; cc[0]++) {
             for (cc[1] = cp[1] - 1; cc[1] <= cp[1] + 1; cc[1]++) {
                 index = mz_grid_index_from_coord(grid, cc);
                 if (!is_vald_coord(grid, cc))
                     continue;
-                calc_quantities_cell(particles, i, grid, index, &dens, grad,
-                    particles->positions[i], support);
+                calc_quantities_cell(particles, i, grid, index, &nom,
+                    &denoma, denomb, particles->positions[i], support);
             }
         }
-        dens = dens / rest_density - 1.0;
+        nom = nom / rest_density - 1.0;
+        particles->lambdas[i] = nom / (denoma + mz_dot(denomb, denomb)) * rho2;
     }
     return MZ_SUCCESS;
 }
