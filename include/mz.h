@@ -18,17 +18,14 @@ typedef struct {
 typedef struct {
     float (*positions)[2];
     float (*velocities)[2];
-    float *lambdas;                                      /* step sizes        */
-    float (*dpositions)[2];                              /* positions updates */
-#ifdef MZ_STORE_DENSITIES
-    float *densities;
-#endif
+    float *lambdas;                                     /* step sizes        */
+    float (*dpositions)[2];                             /* positions updates */
     int num_particles;
-} mz_particles;
+} mz_fluid;
 
 /*
  * Acceleration structure for quickly finding particle neighbors.
- * TODO: Sorting particles by their cell id instead of storing [ids] might
+ * TODO: Sorting fluid by their cell id instead of storing [ids] might
  *       increase overall memory coherency.
  * TODO: Using Z-ordering might increase memory coherency.
  */
@@ -37,11 +34,11 @@ typedef struct {
     float dx;
     int num_cells_total;
     int num_cells[2];
-    int *num_particles;                 /* # particles for each cell.         */
+    int *num_particles;                 /* # fluid for each cell.             */
     int *start_ids;                     /* reference to the first particle id
                                            for each cell in [ids].            */
     int *ids;                           /* particle ids for referencing
-                                           particles within a cell            */
+                                           fluid within a cell                */
 } mz_grid;
 
 extern int mz_make_domain(
@@ -55,19 +52,19 @@ extern int mz_make_domain(
 #define mz_grid_index_from_coord(grid, coord)                                  \
     (coord)[0] * (grid)->num_cells[0] + (coord)[1]
 
-extern int mz_init_particles(
-    mz_particles *particles,
-    unsigned int num_particles
+extern int mz_init_fluid(
+    mz_fluid *fluid,
+    unsigned int num_fluid
 );
-extern void mz_deinit_particles(mz_particles *particles);
+extern void mz_deinit_fluid(mz_fluid *fluid);
 
 extern int mz_init_grid(
     mz_grid *grid,
-    const mz_particles *particles,
+    const mz_fluid *fluid,
     const mz_domain *domain,
     float dx
 );
-extern int mz_update_grid(mz_grid *grid, const mz_particles *particles);
+extern int mz_update_grid(mz_grid *grid, const mz_fluid *fluid);
 extern void mz_deinit_grid(mz_grid *grid);
 
 /*
@@ -92,7 +89,7 @@ extern bool mz_grid_index_from_position(
 );
 
 extern int mz_calc_lambdas(
-    mz_particles *particles, 
+    mz_fluid *fluid,
     const mz_grid *grid,
     float rest_density,
     float support

@@ -8,6 +8,7 @@ to_string(
     layout (location = 0) in vec2 position;
 
     void main() {
+        gl_PointSize = 4.0;
         gl_Position = vec4(position, 0.0, 1.0);
     }
 );
@@ -18,7 +19,7 @@ to_string(
     layout (location = 0) out vec3 color;
 
     void main() {
-        color = vec3(1.0, 0.0, 0.0);
+        color = vec3(0.0, 0.6, 0.8);
     }
 );
 
@@ -28,6 +29,7 @@ void init_render_state(struct render_state *state) {
     glh_attach_shader_with_source(state->program, GL_FRAGMENT_SHADER, fsh_source);
     glh_link_program(state->program);
     glClearColor(0.2, 0.2, 0.2, 1.0);
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 }
 
 void deinit_render_state(struct render_state *state) {
@@ -37,7 +39,7 @@ void deinit_render_state(struct render_state *state) {
 void render(struct render_state *state, struct gl_fluid *fluid) {
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(state->program);
-//    glBindVertexArray(fluid->vao);
-//    glDrawArrays(GL_POINTS, 0, fluid->count);
+    glBindVertexArray(fluid->vao);
+    glDrawArrays(GL_POINTS, 0, fluid->count);
 }
 

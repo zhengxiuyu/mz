@@ -1,8 +1,8 @@
 CC=clang
 FLAGS=-Wall -pedantic
-INC_DIRS=-I../../include/scene -I../../include/common -I/usr/local/include
-LIB_DIRS=-L../../lib -L/usr/local/lib
-LIBS=-lglfw3 -lGLEW -framework OpenGL -framework Foundation -framework CoreVideo -framework CoreGraphics -framework IOKit -framework AppKit
+INC_DIRS=-I../include -I/usr/local/include
+LIB_DIRS=-L../lib -L/usr/local/lib
+LIBS=-lglfw3 -lGLEW -lmz -framework OpenGL -framework Foundation -framework CoreVideo -framework CoreGraphics -framework IOKit -framework AppKit
 OBJS=gl_fluid.o glh.o render.o
 TARGET=demo
 

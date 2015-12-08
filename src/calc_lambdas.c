@@ -24,7 +24,7 @@ static float eval_spiky_grad(float r, float h) {
 }
 
 static void calc_quantities_cell(
-    mz_particles *particles,
+    mz_fluid *fluid,
     int particle_index,
     const mz_grid *grid,
     int cell_index,
@@ -41,7 +41,7 @@ static void calc_quantities_cell(
         int k = grid->ids[i];
         float dot, diff[2], r, w;;
 
-        mz_sub(diff, position, particles->positions[k]);
+        mz_sub(diff, position, fluid->positions[k]);
         dot = mz_dot(diff, diff);
         if (dot > support * support)
             continue;
@@ -49,7 +49,7 @@ static void calc_quantities_cell(
         r = sqrtf(dot);
         w = eval_poly6(r, support);
         *dens += w;
-        
+
         if (k != particle_index) {
             float spiky = eval_spiky_grad(r, support);
             float grad[2];
@@ -63,7 +63,7 @@ static void calc_quantities_cell(
 }
 
 int mz_calc_lambdas(
-    mz_particles *particles,
+    mz_fluid *fluid,
     const mz_grid *grid,
     float rest_density,
     float support
@@ -78,23 +78,23 @@ int mz_calc_lambdas(
         return MZ_INVALID_ARGUMENTS;
     }
 
-    for (i = 0; i < particles->num_particles; i++) {
+    for (i = 0; i < fluid->num_particles; i++) {
         float nom = 0.0;                        /* density for particle i    */
         float denoma = 0.0, denomb[2];          /* */
 
         memset(denomb, 0, sizeof(float[2]));
-        mz_grid_coord_from_position(grid, cp, particles->positions[i]);
+        mz_grid_coord_from_position(grid, cp, fluid->positions[i]);
         for (cc[0] = cp[0] - 1; cc[0] <= cp[0] + 1; cc[0]++) {
             for (cc[1] = cp[1] - 1; cc[1] <= cp[1] + 1; cc[1]++) {
                 index = mz_grid_index_from_coord(grid, cc);
                 if (!is_vald_coord(grid, cc))
                     continue;
-                calc_quantities_cell(particles, i, grid, index, &nom,
-                    &denoma, denomb, particles->positions[i], support);
+                calc_quantities_cell(fluid, i, grid, index, &nom,
+                    &denoma, denomb, fluid->positions[i], support);
             }
         }
         nom = nom / rest_density - 1.0;
-        particles->lambdas[i] = nom / (denoma + mz_dot(denomb, denomb)) * rho2;
+        fluid->lambdas[i] = nom / (denoma + mz_dot(denomb, denomb)) * rho2;
     }
     return MZ_SUCCESS;
 }

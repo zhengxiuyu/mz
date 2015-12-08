@@ -24,17 +24,18 @@ void update_gl_fluid(
     GLfloat (*positions)[2],
     GLsizei count
 ) {
-    GLsizei size = 0;
+    GLsizei c = 0;
 
     if (count > fluid->capacity) {
         warn("particle count (%d) is greater than the particle capacity (%d)\n",
             count, fluid->count);
-        size = sizeof(GLfloat[2]) * fluid->capacity;
+        c = fluid->capacity;
     } else {
-        size = sizeof(GLfloat[2]) * count;
+        c = count;
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, fluid->positions_vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, size, positions);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, c * sizeof(GLfloat[2]), positions);
+    fluid->count = c;
 }
 
