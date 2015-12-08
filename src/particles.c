@@ -6,14 +6,10 @@ int mz_init_fluid(mz_fluid *fluid, unsigned int num_particles) {
         return MZ_INVALID_ARGUMENTS;
     memset(fluid, 0, sizeof(mz_fluid));
     fluid->num_particles = num_particles;
-    fluid->positions = calloc(num_particles, sizeof(float[2]));
-    mz_checkmem(fluid->positions);
-    fluid->velocities = calloc(num_particles, sizeof(float[2]));
-    mz_checkmem(fluid->velocities);
-    fluid->lambdas = calloc(num_particles, sizeof(float));
-    mz_checkmem(fluid->lambdas);
-    fluid->dpositions = calloc(num_particles, sizeof(float[2]));
-    mz_checkmem(fluid->dpositions);
+    mz_calloc(fluid->positions, num_particles, sizeof(float[2]));
+    mz_calloc(fluid->velocities, num_particles, sizeof(float[2]));
+    mz_calloc(fluid->lambdas, num_particles, sizeof(float));
+    mz_calloc(fluid->dpositions, num_particles, sizeof(float[2]));
     return MZ_SUCCESS;
 
 error:

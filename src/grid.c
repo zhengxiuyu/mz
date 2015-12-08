@@ -15,12 +15,9 @@ int mz_init_grid(
     grid->num_cells[0] = ceil(domain->extent[0] / dx);
     grid->num_cells[1] = ceil(domain->extent[1] / dx);
     grid->num_cells_total = grid->num_cells[0] * grid->num_cells[1];
-    grid->num_particles = calloc(grid->num_cells_total, sizeof(unsigned int));
-    mz_checkmem(grid->num_particles);
-    grid->start_ids = calloc(grid->num_cells_total, sizeof(unsigned int));
-    mz_checkmem(grid->start_ids);
-    grid->ids = calloc(fluid->num_particles, sizeof(unsigned int));
-    mz_checkmem(grid->ids);
+    mz_calloc(grid->num_particles, grid->num_cells_total, sizeof(unsigned int));
+    mz_calloc(grid->start_ids, grid->num_cells_total, sizeof(unsigned int));
+    mz_calloc(grid->ids, fluid->num_particles, sizeof(unsigned int));
     return MZ_SUCCESS;
 
 error:

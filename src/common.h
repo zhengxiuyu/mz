@@ -24,6 +24,10 @@
     #define mz_debug_if(x, ...)
 #endif
 
+#define mz_calloc(x, n, s)                                                      \
+    if (!((x) = calloc((n), (s))))                                              \
+        goto error
+
 #define mz_checkmem(x) if (!(x)) goto error
 #define mz_min(a, b) (a) < (b) ? (a) : (b)
 #define mz_max(a, b) (a) > (b) ? (a) : (b)
