@@ -18,8 +18,8 @@ typedef struct {
 typedef struct {
     float (*positions)[2];
     float (*velocities)[2];
-    float *lambdas;                                      /* step sizes          */
-    float (*dpositions)[2];                              /* positions updates   */
+    float *lambdas;                                      /* step sizes        */
+    float (*dpositions)[2];                              /* positions updates */
 #ifdef MZ_STORE_DENSITIES
     float *densities;
 #endif
@@ -37,11 +37,11 @@ typedef struct {
     float dx;
     int num_cells_total;
     int num_cells[2];
-    int *num_particles;                 /* # particles for each cell.           */
+    int *num_particles;                 /* # particles for each cell.         */
     int *start_ids;                     /* reference to the first particle id
-                                           for each cell in [ids].              */
+                                           for each cell in [ids].            */
     int *ids;                           /* particle ids for referencing
-                                           particles within a cell              */
+                                           particles within a cell            */
 } mz_grid;
 
 extern int mz_make_domain(
