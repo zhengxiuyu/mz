@@ -1,7 +1,7 @@
 CC=clang
 FLAGS=-Wall -pedantic
 INC_DIRS =-I../include
-OBJS=particles.o grid.o domain.o calc_lambdas.o
+OBJS=fluid.o grid.o domain.o calc_lambdas.o
 TARGET=libmz.a
 
 all: $(OBJS)
