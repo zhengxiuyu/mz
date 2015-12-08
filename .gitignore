@@ -1,6 +1,7 @@
 lib/
 bin/
 test/
+vs/
 *.o
 *.a
 *.aux
