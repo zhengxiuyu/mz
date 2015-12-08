@@ -27,7 +27,7 @@ void update_gl_fluid(
     GLsizei size = 0;
 
     if (count > fluid->capacity) {
-        warn("particle count (%lu) is greater than the particle capacity (%lu)\n",
+        warn("particle count (%d) is greater than the particle capacity (%d)\n",
             count, fluid->count);
         size = sizeof(GLfloat[2]) * fluid->capacity;
     } else {

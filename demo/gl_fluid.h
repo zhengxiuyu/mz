@@ -1,7 +1,7 @@
 #ifndef GL_FLUID_H
 #define GL_FLUID_H
 
-#include <GL/glew.h>
+#include "glh.h"
 
 struct gl_fluid {
     GLuint vao;

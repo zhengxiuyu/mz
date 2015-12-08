@@ -2,6 +2,7 @@
 #define COMMON_H
 
 #include <stdio.h>
+#include <assert.h>
 
 #define warn(...)                                                             \
     do {                                                                      \
