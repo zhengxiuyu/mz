@@ -69,7 +69,7 @@ int mz_calc_lambdas(
 ) {
     int i = 0;
     int cp[2], cc[2];              /* grid coordinates for particle and cell */
-    int index;                     /* particle index                         */
+    int index;
     float restdens = fluid->rest_density;
     float rho2 = restdens * restdens;
 
@@ -100,25 +100,67 @@ int mz_calc_lambdas(
     return MZ_SUCCESS;
 }
 
-void mz_calc_lambdas_naive(mz_fluid *fluid, float support) {
-    int i = 0, j = 0;
+static void update_dposition_cell(
+    mz_fluid *fluid,
+    int particle_index,
+    const mz_grid *grid,
+    int cell_index,
+    float dposition[2],
+    const float position[2],
+    float support
+) {
+    int i = grid->start_ids[cell_index];
+    int imax = i + grid->num_particles[cell_index];
 
-    for (i = 0; i < fluid->num_particles; i++) {
-        float dens = 0;
+    for (; i < imax; i++) {
+        int k = grid->ids[i];
+        float diff[2], dot, r, spiky, tmp;
 
-        for (j = 0; j < fluid->num_particles; j++) {
-            float diff[2], dot;
+        mz_sub(diff, position, fluid->positions[k]);
+        dot = mz_dot(diff, diff);
+        if (dot > support * support || k == particle_index)
+            continue;
+        r = sqrt(dot);
+        spiky = eval_spiky_grad(r, support);
+        tmp = (fluid->lambdas[particle_index] + fluid->lambdas[k]) * spiky;
+        dposition[0] = tmp * diff[0];
+        dposition[1] = tmp * diff[1];
+    }
+}
 
-            mz_sub(diff, fluid->positions[i], fluid->positions[j]);
-            dot = mz_dot(diff, diff);
-            if (dot <= support * support) {
-                float r = sqrtf(dot);
-                float w = eval_poly6(r, support);
+extern int mz_calc_dpositions(
+    mz_fluid *fluid,
+    const mz_grid *grid,
+    float support
+) {
+    int cp[2], cc[2];              /* grid coordinates for particle and cell */
+    int pidx;                      /* particle index */
 
-                dens += w;
+    if (support != grid->dx) {
+        mz_debug("Expected support to equal grid spacing");
+        return MZ_INVALID_ARGUMENTS;
+    }
+
+    for (pidx = 0; pidx < fluid->num_particles; pidx++) {
+        float pos[2];
+        float dpos[2];
+
+        memcpy(pos, fluid->positions[pidx], sizeof(float[2]));
+        memset(dpos, 0, sizeof(float[2]));
+        mz_grid_coord_from_position(grid, cp, pos);
+        for (cc[0] = cp[0] - 1; cc[0] <= cp[0] + 1; cc[0]++) {
+            for (cc[1] = cp[1] - 1; cc[1] <= cp[1] + 1; cc[1]++) {
+                int cidx = mz_grid_index_from_coord(grid, cc);
+                if (!is_valid_coord(grid, cc))
+                    continue;
+                update_dposition_cell(fluid, pidx, grid, cidx, dpos,
+                    pos, support);
             }
         }
-        fluid->densities[i] = dens;
+        dpos[0] /= fluid->rest_density;
+        dpos[1] /= fluid->rest_density;
+        memcpy(fluid->dpositions[pidx], dpos, sizeof(float[2]));
     }
+    return MZ_SUCCESS;
 }
 

@@ -45,9 +45,10 @@ static void init() {
 static void update() {
     mz_update_grid(&_grid, &_fluid);
     mz_calc_lambdas(&_fluid, &_grid, SUPPORT);
+    mz_calc_dpositions(&_fluid, &_grid, SUPPORT);
 
     for (int i = 0; i < _fluid.num_particles; i++)
-        printf("%-3d %-10.5f %-10.5f\n", i, _fluid.densities[i], _fluid.lambdas[i]);
+        printf("%-3d %-10.5f %-10.5f %-10.5f %-10.5f\n", i, _fluid.densities[i], _fluid.lambdas[i], _fluid.dpositions[i][0], _fluid.dpositions[i][1]);
 
 //    for (int i = 0; i < _grid.num_cells_total; i++)
 //        printf("%d\n", _grid.num_particles[i]);

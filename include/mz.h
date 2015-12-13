@@ -97,6 +97,10 @@ extern int mz_calc_lambdas(
     const mz_grid *grid,
     float support
 );
-extern void mz_calc_lambdas_naive(mz_fluid *fluid, float support);
 
+extern int mz_calc_dpositions(
+    mz_fluid *fluid,
+    const mz_grid *grid,
+    float support
+);
 #endif /* end of include guard: PARTICLES_H */
