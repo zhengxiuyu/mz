@@ -13,4 +13,4 @@ all: main.c $(OBJS)
 	mv $(TARGET) ../bin
 
 %.o : %.c
-	$(CC) -c $< $(FLAGS) $(INC_DIR) $(FLAGS)
+	$(CC) -c $< $(FLAGS) $(INC_DIRS) $(FLAGS)

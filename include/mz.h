@@ -20,6 +20,8 @@ typedef struct {
     float (*velocities)[2];
     float *lambdas;                                     /* step sizes        */
     float (*dpositions)[2];                             /* positions updates */
+    float *densities;
+    float rest_density;
     int num_particles;
 } mz_fluid;
 
@@ -54,9 +56,11 @@ extern int mz_make_domain(
 
 extern int mz_init_fluid(
     mz_fluid *fluid,
-    unsigned int num_fluid
+    float rest_density,
+    unsigned int num_particles
 );
 extern void mz_deinit_fluid(mz_fluid *fluid);
+extern int mz_copy_fluid(mz_fluid *dst, const mz_fluid *src);
 
 extern int mz_init_grid(
     mz_grid *grid,
@@ -91,8 +95,8 @@ extern bool mz_grid_index_from_position(
 extern int mz_calc_lambdas(
     mz_fluid *fluid,
     const mz_grid *grid,
-    float rest_density,
     float support
 );
+extern void mz_calc_lambdas_naive(mz_fluid *fluid, float support);
 
 #endif /* end of include guard: PARTICLES_H */

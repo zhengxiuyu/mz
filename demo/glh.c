@@ -113,3 +113,11 @@ int glh_link_program(GLuint program) {
     free(shaders);
     return 0;
 }
+
+void glh_uniform1f(GLuint program, const GLchar * name, GLfloat f) {
+	GLint loc = glGetUniformLocation(program, name);
+	
+	if (loc < 0)
+		return;
+	glUniform1f(loc, f);
+}

@@ -4,40 +4,62 @@
 #include "common.h"
 #include "render.h"
 
+/* simulation parameters */
+#define REST_DENSITY 10000
+#define NUM_PARTICLES_SUPP 30
+#define SUPPORT sqrtf(NUM_PARTICLES_SUPP / (M_PI * REST_DENSITY))
+#define NUM_PARTICLES_SQRT 100
+#define NUM_PARTICLES NUM_PARTICLES_SQRT * NUM_PARTICLES_SQRT
+
 static GLFWwindow *_window = NULL;
 static struct render_state _state;
 static struct gl_fluid _gl_fluid;
 static mz_fluid _fluid;
+static mz_fluid _fluid_2;
+static mz_grid _grid;
+static mz_domain _domain;
 
 static void init_fluid()
 {
     int i, j;
 
-    mz_init_fluid(&_fluid, 10000);
-    for (i = 0; i < 100; i++) {
-        for (j = 0; j < 100; j++) {
-            int idx = 100 * i + j;
-            _fluid.positions[idx][0] = -0.5 + i / 100.0;
-            _fluid.positions[idx][1] = -0.5 + j / 100.0;
+    mz_init_fluid(&_fluid, REST_DENSITY, NUM_PARTICLES);
+    for (i = 0; i < NUM_PARTICLES_SQRT; i++) {
+        for (j = 0; j < NUM_PARTICLES_SQRT; j++) {
+            int idx = NUM_PARTICLES_SQRT * i + j;
+            _fluid.positions[idx][0] = -0.5 + i / (float)NUM_PARTICLES_SQRT;
+            _fluid.positions[idx][1] = -0.5 + j / (float)NUM_PARTICLES_SQRT;
         }
     }
 
-    init_gl_fluid(&_gl_fluid, 10000);
+    init_gl_fluid(&_gl_fluid, &_fluid);
+    mz_make_domain(&_domain, -1.0, -1.0, 1.0, 1.0);
+    mz_init_grid(&_grid, &_fluid, &_domain, SUPPORT);
 }
 
 static void init() {
-    init_render_state(&_state);
+    init_render_state(&_state, 500.0);
     init_fluid();
 }
 
 static void update() {
-    update_gl_fluid(&_gl_fluid, _fluid.positions, _fluid.num_particles);
+    mz_update_grid(&_grid, &_fluid);
+    mz_calc_lambdas(&_fluid, &_grid, SUPPORT);
+
+    for (int i = 0; i < _fluid.num_particles; i++)
+        printf("%-3d %-10.5f %-10.5f\n", i, _fluid.densities[i], _fluid.lambdas[i]);
+
+//    for (int i = 0; i < _grid.num_cells_total; i++)
+//        printf("%d\n", _grid.num_particles[i]);
+
+    update_gl_fluid(&_gl_fluid, &_fluid);
     render(&_state, &_gl_fluid);
 }
 
 static void deinit() {
     deinit_render_state(&_state);
     mz_deinit_fluid(&_fluid);
+    mz_deinit_grid(&_grid);
     deinit_gl_fluid(&_gl_fluid);
 }
 
@@ -75,3 +97,4 @@ int main(int argc, const char *argv[]) {
     glfwTerminate();
     return 0;
 }
+
