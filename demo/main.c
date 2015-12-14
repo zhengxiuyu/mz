@@ -38,7 +38,7 @@ static void init_fluid()
 }
 
 static void init() {
-    init_render_state(&_state, 500.0);
+    init_render_state(&_state, 5000.0);
     init_fluid();
 }
 

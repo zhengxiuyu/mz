@@ -8,6 +8,7 @@ to_string(
     layout (location = 0) in vec2 position;
     layout (location = 1) in float density;
     out vec3 color_vout;
+    uniform float rest_density;
     uniform float dens_diff_max;
 
     vec3 get_color(float v, float vmin, float vmax) {
@@ -40,7 +41,7 @@ to_string(
     void main() {
         gl_PointSize = 4.0;
         gl_Position = vec4(position, 0.0, 1.0);
-        float diff = abs(density - dens_diff_max);
+        float diff = abs(density - rest_density);
         color_vout = get_color(diff, 0.0, dens_diff_max);
     }
 );
@@ -76,6 +77,7 @@ void deinit_render_state(struct render_state *state) {
 void render(struct render_state *state, struct gl_fluid *fluid) {
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(state->program);
+    glh_uniform1f(state->program, "rest_density", fluid->rest_density);
     glh_uniform1f(state->program, "dens_diff_max", state->dens_diff_max);
     glBindVertexArray(fluid->vao);
     glDrawArrays(GL_POINTS, 0, fluid->count);

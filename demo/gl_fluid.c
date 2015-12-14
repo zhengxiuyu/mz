@@ -6,6 +6,7 @@ void init_gl_fluid(
     const mz_fluid *fluid
 ) {
     gl_fluid->count = fluid->num_particles;
+    gl_fluid->rest_density = fluid->rest_density;
     glGenVertexArrays(1, &gl_fluid->vao);
     glBindVertexArray(gl_fluid->vao);
     glGenBuffers(1, &gl_fluid->positions_vbo);
