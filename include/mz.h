@@ -91,16 +91,18 @@ extern bool mz_grid_index_from_position(
     int *index,
     float position[2]
 );
-
 extern int mz_calc_lambdas(
     mz_fluid *fluid,
     const mz_grid *grid,
     float support
 );
-
+extern void mz_calc_lambdas_naive(mz_fluid *fluid, float support);
 extern int mz_calc_dpositions(
     mz_fluid *fluid,
     const mz_grid *grid,
     float support
 );
+extern void mz_calc_dpositions_naive(mz_fluid *fluid, float support);
+extern void mz_update_positions(mz_fluid *fluid);
+
 #endif /* end of include guard: PARTICLES_H */

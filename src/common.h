@@ -28,6 +28,7 @@
     if (!((x) = calloc((n), (s))))                                              \
         goto error
 
+#define mz_printif(x, ...) if ((x)) printf(__VA_ARGS__)
 #define mz_checkmem(x) if (!(x)) goto error
 #define mz_min(a, b) (a) < (b) ? (a) : (b)
 #define mz_max(a, b) (a) > (b) ? (a) : (b)

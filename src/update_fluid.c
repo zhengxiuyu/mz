@@ -1,9 +1,9 @@
 #include <mz.h>
 #include "common.h"
 
-#define EPS 0.0001
+#define EPS 0.01
 
-#define is_valid_coord(grid, coord)                                            \
+#define is_valid_coord(grid, coord)                                           \
     (mz_inrange((coord)[0], 0, (grid)->num_cells[0] - 1) &&                   \
         mz_inrange((coord)[1], 0, (grid)->num_cells[1] - 1))
 
@@ -18,7 +18,7 @@ static float eval_poly6(float r, float h) {
 
 static float eval_spiky_grad(float r, float h) {
     const float c = -30.0 / M_PI;
-    float h5 = h * h * h * h * h;
+    float h5 = h * h * h * h * h;       /* numerical error if h is small? */
     float b = h - r;
     return c / (h5 * r) * b * b;
 }
@@ -69,7 +69,6 @@ int mz_calc_lambdas(
 ) {
     int i = 0;
     int cp[2], cc[2];              /* grid coordinates for particle and cell */
-    int index;
     float restdens = fluid->rest_density;
     float rho2 = restdens * restdens;
 
@@ -86,7 +85,8 @@ int mz_calc_lambdas(
         mz_grid_coord_from_position(grid, cp, fluid->positions[i]);
         for (cc[0] = cp[0] - 1; cc[0] <= cp[0] + 1; cc[0]++) {
             for (cc[1] = cp[1] - 1; cc[1] <= cp[1] + 1; cc[1]++) {
-                index = mz_grid_index_from_coord(grid, cc);
+                int index = mz_grid_index_from_coord(grid, cc);
+
                 if (!is_valid_coord(grid, cc))
                     continue;
                 calc_quantities_cell(fluid, i, grid, index, &nom,
@@ -95,9 +95,46 @@ int mz_calc_lambdas(
         }
         fluid->densities[i] = nom;
         nom = nom / restdens - 1.0;
-        fluid->lambdas[i] = nom / (denoma + mz_dot(denomb, denomb)) * rho2;
+        fluid->lambdas[i] = -nom / (denoma + mz_dot(denomb, denomb) + EPS) * rho2;
     }
     return MZ_SUCCESS;
+}
+
+void mz_calc_lambdas_naive(mz_fluid *fluid, float support) {
+    int i, j;
+    float invrest = 1.0 / fluid->rest_density;
+
+    for (i = 0; i < fluid->num_particles; i++) {
+        float pi[2], dens = 0.0;
+        float a = 0.0, b[2];
+
+        memcpy(pi, fluid->positions[i], sizeof(float[2]));
+        memset(b, 0, sizeof(float[2]));
+        for (j = 0; j < fluid->num_particles; j++) {
+            float pij[2], len;
+
+            mz_sub(pij, pi, fluid->positions[j]);
+            len = mz_dot(pij, pij);
+            if (len < support * support) {
+                len = sqrtf(len);
+                dens += eval_poly6(len, support);
+
+                if (i != j) {
+                    float spiky = eval_spiky_grad(len, support);
+                    float grad[2];
+
+                    grad[0] = invrest * spiky * pij[0];
+                    grad[1] = invrest * spiky * pij[1];
+                    a += mz_dot(grad, grad);
+                    b[0] += grad[0];
+                    b[1] += grad[1];
+                }
+            }
+        }
+
+        fluid->densities[i] = dens;
+        fluid->lambdas[i] = -(dens * invrest - 1.0) /  (a + mz_dot(b, b) + EPS);
+    }
 }
 
 static void update_dposition_cell(
@@ -120,15 +157,15 @@ static void update_dposition_cell(
         dot = mz_dot(diff, diff);
         if (dot > support * support || k == particle_index)
             continue;
-        r = sqrt(dot);
+        r = sqrtf(dot);
         spiky = eval_spiky_grad(r, support);
         tmp = (fluid->lambdas[particle_index] + fluid->lambdas[k]) * spiky;
-        dposition[0] = tmp * diff[0];
-        dposition[1] = tmp * diff[1];
+        dposition[0] += tmp * diff[0];
+        dposition[1] += tmp * diff[1];
     }
 }
 
-extern int mz_calc_dpositions(
+int mz_calc_dpositions(
     mz_fluid *fluid,
     const mz_grid *grid,
     float support
@@ -151,6 +188,7 @@ extern int mz_calc_dpositions(
         for (cc[0] = cp[0] - 1; cc[0] <= cp[0] + 1; cc[0]++) {
             for (cc[1] = cp[1] - 1; cc[1] <= cp[1] + 1; cc[1]++) {
                 int cidx = mz_grid_index_from_coord(grid, cc);
+
                 if (!is_valid_coord(grid, cc))
                     continue;
                 update_dposition_cell(fluid, pidx, grid, cidx, dpos,
@@ -162,5 +200,47 @@ extern int mz_calc_dpositions(
         memcpy(fluid->dpositions[pidx], dpos, sizeof(float[2]));
     }
     return MZ_SUCCESS;
+}
+
+void mz_calc_dpositions_naive(mz_fluid *fluid, float support) {
+    int i, j;
+    float invrest = 1.0 / fluid->rest_density;
+
+    for (i = 0; i < fluid->num_particles; i++) {
+        float dpos[2], pi[2], lami;
+
+        lami = fluid->lambdas[i];
+        memset(dpos, 0, sizeof(float[2]));
+        memcpy(pi, fluid->positions[i], sizeof(float[2]));
+        for (j = 0; j < fluid->num_particles; j++) {
+            float pij[2], len;
+
+            mz_sub(pij, pi, fluid->positions[j]);
+            len = mz_dot(pij, pij);
+            if ((len < support * support) && (i != j)) {
+                float spiky, a;
+                const float k = 0.001;
+                float q = 0.0 * support;
+                float s = eval_poly6(len, support) / eval_poly6(q, support);
+
+                len = sqrtf(len);
+                spiky = eval_spiky_grad(len, support);
+                a = invrest * (lami + fluid->lambdas[j] - k * s * s * s * s) * spiky;
+                dpos[0] += a * pij[0];
+                dpos[1] += a * pij[1];
+            }
+        }
+        memcpy(fluid->dpositions[i], dpos, sizeof(float[2]));
+    }
+}
+
+void mz_update_positions(mz_fluid *fluid)
+{
+    int i;
+
+    for (i = 0; i < fluid->num_particles; i++) {
+        fluid->positions[i][0] += fluid->dpositions[i][0];
+        fluid->positions[i][1] += fluid->dpositions[i][1];
+    }
 }
 
