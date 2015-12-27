@@ -6,22 +6,19 @@
 #include <unistd.h>
 
 /* simulation parameters */
-#define REST_DENSITY 1000
-#define NUM_PARTICLES_SUPP 15
-#define SUPPORT 0.1
-#define NUM_PARTICLES_SQRT 33
+#define REST_DENSITY 1500
+#define SUPPORT 0.06
+#define NUM_PARTICLES_SQRT 32
 #define NUM_PARTICLES NUM_PARTICLES_SQRT * NUM_PARTICLES_SQRT
 
 static GLFWwindow *_window = NULL;
 static struct render_state _state;
 static struct gl_fluid _gl_fluid;
-static mz_fluid _fluid;
-static mz_fluid _fluid_2;
-static mz_grid _grid;
-static mz_domain _domain;
+static struct mz_parameters params;
+static struct mz_fluid _fluid;
+static struct mz_fluid _fluid_2;
 
-static void init_fluid()
-{
+static void init_fluid() {
     int i, j;
 
     mz_init_fluid(&_fluid, REST_DENSITY, NUM_PARTICLES);
@@ -35,31 +32,39 @@ static void init_fluid()
     }
 
     init_gl_fluid(&_gl_fluid, &_fluid);
-    mz_make_domain(&_domain, -1.0, -1.0, 1.0, 1.0);
-    mz_init_grid(&_grid, &_fluid, &_domain, SUPPORT);
     printf("SUPPORT = %f\n", SUPPORT);
 }
 
 static void init() {
-    init_render_state(&_state, 500.0);
+    params.support = 0.05;
+    params.relaxation = 0.01;
+    params.repulsion_k = 0.0;
+    params.repulsion_q = 0.0;
+    init_render_state(&_state, 200.0);
     init_fluid();
 }
 
+static void print_iteration() {
+    static int i = 0;
+    printf("Iteration : %.3d\n", i);
+    printf("===============\n");
+    i++;
+}
+
 static void update() {
-    sleep(1.0);
-    mz_update_grid(&_grid, &_fluid);
-    mz_calc_lambdas_naive(&_fluid, SUPPORT);
-    mz_calc_dpositions_naive(&_fluid, SUPPORT);
+    print_iteration();
+    mz_calc_lambdas_naive(&_fluid, &params);
+    mz_calc_dpositions_naive(&_fluid, &params);
     mz_update_positions(&_fluid);
 
 
-    printf("0  [%f %f] [%f %f] %f\n", _fluid.positions[0][0], _fluid.positions[0][1], _fluid.dpositions[0][0], _fluid.dpositions[0][1], _fluid.densities[0]);
-    printf("32 [%f %f] [%f %f] %f\n", _fluid.positions[32][0], _fluid.positions[32][1], _fluid.dpositions[32][0], _fluid.dpositions[32][1], _fluid.densities[32]);
-//    for (int i = 0; i < _fluid.num_particles; i++) {
-//        float *dpos = _fluid.dpositions[i];
-//        float len = sqrtf(dpos[0] * dpos[0] + dpos[1] * dpos[1]);
-//        printf("%-3d %-10.5f %-10.5f %-10.5f %-10.5f %-10.5f\n", i, _fluid.densities[i], _fluid.lambdas[i], _fluid.dpositions[i][0], _fluid.dpositions[i][1], len);
-//    }
+//    printf("0  [%f %f] [%f %f] %f\n", _fluid.positions[0][0], _fluid.positions[0][1], _fluid.dpositions[0][0], _fluid.dpositions[0][1], _fluid.densities[0]);
+//    printf("32 [%f %f] [%f %f] %f\n", _fluid.positions[32][0], _fluid.positions[32][1], _fluid.dpositions[32][0], _fluid.dpositions[32][1], _fluid.densities[32]);
+//   for (int i = 0; i < _fluid.num_particles; i++) {
+//       float *dpos = _fluid.dpositions[i];
+//       float len = sqrtf(dpos[0] * dpos[0] + dpos[1] * dpos[1]);
+//       printf("%-3d %-10.5f %-10.5f %-10.5f %-10.5f %-10.5f\n", i, _fluid.densities[i], _fluid.lambdas[i], _fluid.dpositions[i][0], _fluid.dpositions[i][1], len);
+//   }
 
 //    for (int i = 0; i < _grid.num_cells_total; i++)
 //        printf("%d\n", _grid.num_particles[i]);
@@ -71,7 +76,6 @@ static void update() {
 static void deinit() {
     deinit_render_state(&_state);
     mz_deinit_fluid(&_fluid);
-    mz_deinit_grid(&_grid);
     deinit_gl_fluid(&_gl_fluid);
 }
 

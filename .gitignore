@@ -1,6 +1,7 @@
 lib/
 bin/
 doc/
+res/
 test/
 vs/
 *.o

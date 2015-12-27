@@ -14,7 +14,7 @@
     #define mz_debug(...)                                                       \
         do {                                                                    \
             printf("[mz] %-10s(%-5s): ", __FILE__, __LINE__);                   \
-            printf(__VA_ARGS__)                                                 \
+            printf(__VA_ARGS__);                                                \
         } while(0)
     #define mz_debug_if(x, ...)                                                 \
         if ((x))                                                                \
@@ -34,6 +34,7 @@
 #define mz_max(a, b) (a) > (b) ? (a) : (b)
 #define mz_clamp(x, a, b) mz_min((b), mz_max((x), (a)))
 #define mz_inrange(x, a, b) ((x) >= (a) && (x) <= (b))
+#define mz_length(x) sqrtf((x)[0] * (x)[0] + (x)[1] * (x)[1])
 
 #define mz_set(v, a, b)                                                         \
     (v)[0] = (a);                                                               \

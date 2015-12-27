@@ -66,7 +66,7 @@ void init_render_state(
     glh_attach_shader_with_source(state->program, GL_VERTEX_SHADER, vsh_source);
     glh_attach_shader_with_source(state->program, GL_FRAGMENT_SHADER, fsh_source);
     glh_link_program(state->program);
-    glClearColor(0.2, 0.2, 0.2, 1.0);
+    glClearColor(0.1, 0.1, 0.1, 1.0);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 }
 
