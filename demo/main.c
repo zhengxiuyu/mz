@@ -6,10 +6,11 @@
 #include <unistd.h>
 
 /* simulation parameters */
-#define REST_DENSITY 1500
-#define SUPPORT 0.06
+#define SUPPORT 0.05
+#define DX 0.02
 #define NUM_PARTICLES_SQRT 32
 #define NUM_PARTICLES NUM_PARTICLES_SQRT * NUM_PARTICLES_SQRT
+#define REST_DENSITY 1.0 / (DX * DX)
 
 static GLFWwindow *_window = NULL;
 static struct render_state _state;
@@ -25,9 +26,9 @@ static void init_fluid() {
     for (i = 0; i < NUM_PARTICLES_SQRT; i++) {
         for (j = 0; j < NUM_PARTICLES_SQRT; j++) {
             int idx = NUM_PARTICLES_SQRT * i + j;
-
-            _fluid.positions[idx][0] = -0.5 + i / ((float)NUM_PARTICLES_SQRT - 1.0);
-            _fluid.positions[idx][1] = -0.5 + j / ((float)NUM_PARTICLES_SQRT - 1.0);
+            double x0 = -0.5 * NUM_PARTICLES_SQRT * DX;
+            _fluid.positions[idx][0] = x0 + i * DX;
+            _fluid.positions[idx][1] = x0 + j * DX;
         }
     }
 
@@ -36,10 +37,10 @@ static void init_fluid() {
 }
 
 static void init() {
-    params.support = 0.05;
+    params.support = 0.10;
     params.relaxation = 0.01;
-    params.repulsion_k = 0.0;
-    params.repulsion_q = 0.0;
+    params.repulsion_k = 0.0010;
+    params.repulsion_q = 0.4 * params.support;
     init_render_state(&_state, 200.0);
     init_fluid();
 }

@@ -27,10 +27,9 @@ void mz_calc_lambdas_naive(
 
     for (i = 0; i < fluid->num_particles; i++) {
         double pi[2], dens = 0.0;
-        double a = 0.0, b[2];
+        double a = 0.0, b[2] = {0.0, 0.0};
 
         memcpy(pi, fluid->positions[i], sizeof(pi));
-        memset(b, 0, sizeof(b));
         for (j = 0; j < fluid->num_particles; j++) {
             double pij[2], len;
 
@@ -65,10 +64,9 @@ void mz_calc_dpositions_naive(
     double support = parameters->support;
 
     for (i = 0; i < fluid->num_particles; i++) {
-        double dpos[2], pi[2];
+        double dpos[2] = {0.0, 0.0}, pi[2];
         double lami = fluid->lambdas[i];
 
-        memset(dpos, 0, sizeof(dpos));
         memcpy(pi, fluid->positions[i], sizeof(pi));
         for (j = 0; j < fluid->num_particles; j++) {
             double pij[2], len;
@@ -81,10 +79,12 @@ void mz_calc_dpositions_naive(
                 double q = parameters->repulsion_q;
                 double s;
                 double lamj = fluid->lambdas[j];
+                double corr;
 
                 s = eval_poly6(len, support) / eval_poly6(q, support);
+                corr = -k * s * s * s * s;
                 spiky = eval_spiky_grad(len, support);
-                a = (lami + lamj - k * s * s * s * s) * spiky * invrest / len;
+                a = 0.1 * (lami + lamj + corr) * spiky * invrest / len;
                 dpos[0] += a * pij[0];
                 dpos[1] += a * pij[1];
             }
