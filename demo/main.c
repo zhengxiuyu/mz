@@ -9,7 +9,7 @@
 #define DX 0.5
 #define NUM_PARTICLES_SQRT 40
 #define NUM_PARTICLES NUM_PARTICLES_SQRT * NUM_PARTICLES_SQRT
-#define REST_DENSITY 1.0 / (DX * DX)
+#define REST_DENSITY 1.0 / (DX * DX) * 0.7
 
 static GLFWwindow *_window = NULL;
 static struct render_state _state;
@@ -34,10 +34,10 @@ static void init_fluid() {
 }
 
 static void init() {
-    params.support = 1.5;
+    params.support = 1.2;
     params.relaxation = 0.01;
-    params.repulsion_k = 0.2;
-    params.repulsion_q = 0.0 * params.support;
+    params.repulsion_k = 0.001;
+    params.repulsion_q = 0.2 * params.support;
     params.dpos_atten = 1.0;
     init_render_state(&_state, 2.0);
     init_fluid();

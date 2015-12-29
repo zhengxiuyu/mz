@@ -38,8 +38,8 @@ to_string(
     }
 
     void main() {
-        gl_PointSize = 4.0;
-        gl_Position = vec4(position / 20.0, 0.0, 1.0);
+        gl_PointSize = 1.0;
+        gl_Position = vec4(position / 40.0, 0.0, 1.0);
         float diff = abs(density - rest_density);
         color_vout = get_color(diff, 0.0, dens_diff_max);
 //        color_vout = vec3(0.0, 0.5, 0.8);
