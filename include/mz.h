@@ -14,10 +14,12 @@ struct mz_parameters {
     double relaxation;
     double repulsion_k;
     double repulsion_q;
+    double dpos_atten;
 };
 
 struct mz_fluid {
     double (*positions)[2];
+    double (*positions_tmp)[2];
     double (*velocities)[2];
     double *lambdas;                                     /* step sizes         */
     double (*dpositions)[2];                             /* positions updates  */
@@ -41,6 +43,14 @@ extern void mz_calc_dpositions_naive(
     struct mz_fluid *fluid,
     const struct mz_parameters *parameters
 );
-extern void mz_update_positions(struct mz_fluid *fluid);
+extern void mz_update_positions(
+    struct mz_fluid *fluid,
+    const struct mz_parameters *parameters
+);
+extern void mz_apply_gravity(
+    struct mz_fluid *fluid,
+    double gravity,
+    double dt
+);
 
 #endif /* end of include guard: PARTICLES_H */

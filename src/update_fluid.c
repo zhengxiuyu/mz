@@ -38,7 +38,7 @@ void mz_calc_lambdas_naive(
             if (len < support) {
                 dens += eval_poly6(len, support);
 
-                if (len > 0.000001) {
+                if (len > 0.0) {
                     double spiky = eval_spiky_grad(len, support);
                     double grad[2];
 
@@ -73,7 +73,7 @@ void mz_calc_dpositions_naive(
 
             mz_sub(pij, pi, fluid->positions[j]);
             len = mz_length(pij);
-            if ((len < support) && (len > 0.0000001)) {
+            if ((len < support) && (len > 0.0)) {
                 double spiky, a;
                 const double k = parameters->repulsion_k;
                 double q = parameters->repulsion_q;
@@ -84,7 +84,7 @@ void mz_calc_dpositions_naive(
                 s = eval_poly6(len, support) / eval_poly6(q, support);
                 corr = -k * s * s * s * s;
                 spiky = eval_spiky_grad(len, support);
-                a = 0.1 * (lami + lamj + corr) * spiky * invrest / len;
+                a = (lami + lamj + corr) * spiky * invrest / len;
                 dpos[0] += a * pij[0];
                 dpos[1] += a * pij[1];
             }
@@ -93,12 +93,34 @@ void mz_calc_dpositions_naive(
     }
 }
 
-void mz_update_positions(struct mz_fluid *fluid) {
+void mz_update_positions(
+    struct mz_fluid *fluid,
+    const struct mz_parameters *parameters
+) {
     int i;
+    double a = parameters->dpos_atten;
 
     for (i = 0; i < fluid->num_particles; i++) {
-        fluid->positions[i][0] += fluid->dpositions[i][0];
-        fluid->positions[i][1] += fluid->dpositions[i][1];
+        fluid->positions[i][0] += a * fluid->dpositions[i][0];
+        fluid->positions[i][1] += a * fluid->dpositions[i][1];
+    }
+}
+
+void mz_apply_gravity(
+    struct mz_fluid *fluid,
+    double gravity,
+    double dt
+) {
+    int i;
+    double a = dt * gravity;
+
+    for (i = 0; i < fluid->num_particles; i++) {
+         fluid->velocities[i][0] += a;
+         fluid->velocities[i][1] += a;
+         fluid->positions_tmp[i][0] = fluid->positions[i][0] + 
+             fluid->velocities[i][0] * dt;
+         fluid->positions_tmp[i][1] = fluid->positions[i][1] + 
+             fluid->velocities[i][1] * dt;
     }
 }
 

@@ -6,9 +6,8 @@
 #include <unistd.h>
 
 /* simulation parameters */
-#define SUPPORT 0.05
-#define DX 0.02
-#define NUM_PARTICLES_SQRT 32
+#define DX 0.5
+#define NUM_PARTICLES_SQRT 40
 #define NUM_PARTICLES NUM_PARTICLES_SQRT * NUM_PARTICLES_SQRT
 #define REST_DENSITY 1.0 / (DX * DX)
 
@@ -17,7 +16,6 @@ static struct render_state _state;
 static struct gl_fluid _gl_fluid;
 static struct mz_parameters params;
 static struct mz_fluid _fluid;
-static struct mz_fluid _fluid_2;
 
 static void init_fluid() {
     int i, j;
@@ -33,30 +31,31 @@ static void init_fluid() {
     }
 
     init_gl_fluid(&_gl_fluid, &_fluid);
-    printf("SUPPORT = %f\n", SUPPORT);
 }
 
 static void init() {
-    params.support = 0.10;
+    params.support = 1.5;
     params.relaxation = 0.01;
-    params.repulsion_k = 0.0010;
-    params.repulsion_q = 0.4 * params.support;
-    init_render_state(&_state, 200.0);
+    params.repulsion_k = 0.2;
+    params.repulsion_q = 0.0 * params.support;
+    params.dpos_atten = 1.0;
+    init_render_state(&_state, 2.0);
     init_fluid();
 }
 
-static void print_iteration() {
+static int print_iteration() {
     static int i = 0;
     printf("Iteration : %.3d\n", i);
     printf("===============\n");
     i++;
+    return i;
 }
 
 static void update() {
     print_iteration();
     mz_calc_lambdas_naive(&_fluid, &params);
     mz_calc_dpositions_naive(&_fluid, &params);
-    mz_update_positions(&_fluid);
+    mz_update_positions(&_fluid, &params);
 
 
 //    printf("0  [%f %f] [%f %f] %f\n", _fluid.positions[0][0], _fluid.positions[0][1], _fluid.dpositions[0][0], _fluid.dpositions[0][1], _fluid.densities[0]);

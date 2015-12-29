@@ -7,9 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DCCC775F1C2A9B6A00061923 /* domain.c in Sources */ = {isa = PBXBuildFile; fileRef = DCCC775B1C2A9B6A00061923 /* domain.c */; };
 		DCCC77601C2A9B6A00061923 /* fluid.c in Sources */ = {isa = PBXBuildFile; fileRef = DCCC775C1C2A9B6A00061923 /* fluid.c */; };
-		DCCC77611C2A9B6A00061923 /* grid.c in Sources */ = {isa = PBXBuildFile; fileRef = DCCC775D1C2A9B6A00061923 /* grid.c */; };
 		DCCC77621C2A9B6A00061923 /* update_fluid.c in Sources */ = {isa = PBXBuildFile; fileRef = DCCC775E1C2A9B6A00061923 /* update_fluid.c */; };
 		DCCC776B1C2A9B7C00061923 /* gl_fluid.c in Sources */ = {isa = PBXBuildFile; fileRef = DCCC77641C2A9B7C00061923 /* gl_fluid.c */; };
 		DCCC776C1C2A9B7C00061923 /* glh.c in Sources */ = {isa = PBXBuildFile; fileRef = DCCC77661C2A9B7C00061923 /* glh.c */; };
@@ -41,9 +39,7 @@
 /* Begin PBXFileReference section */
 		DCCC774F1C2A9B4300061923 /* demo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = demo; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCCC775A1C2A9B6A00061923 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = common.h; path = ../../src/common.h; sourceTree = "<group>"; };
-		DCCC775B1C2A9B6A00061923 /* domain.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = domain.c; path = ../../src/domain.c; sourceTree = "<group>"; };
 		DCCC775C1C2A9B6A00061923 /* fluid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fluid.c; path = ../../src/fluid.c; sourceTree = "<group>"; };
-		DCCC775D1C2A9B6A00061923 /* grid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = grid.c; path = ../../src/grid.c; sourceTree = "<group>"; };
 		DCCC775E1C2A9B6A00061923 /* update_fluid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = update_fluid.c; path = ../../src/update_fluid.c; sourceTree = "<group>"; };
 		DCCC77631C2A9B7C00061923 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = common.h; path = ../../../demo/common.h; sourceTree = "<group>"; };
 		DCCC77641C2A9B7C00061923 /* gl_fluid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gl_fluid.c; path = ../../../demo/gl_fluid.c; sourceTree = "<group>"; };
@@ -106,13 +102,13 @@
 			isa = PBXGroup;
 			children = (
 				DCCC77631C2A9B7C00061923 /* common.h */,
-				DCCC77641C2A9B7C00061923 /* gl_fluid.c */,
 				DCCC77651C2A9B7C00061923 /* gl_fluid.h */,
-				DCCC77661C2A9B7C00061923 /* glh.c */,
 				DCCC77671C2A9B7C00061923 /* glh.h */,
-				DCCC77681C2A9B7C00061923 /* main.c */,
-				DCCC77691C2A9B7C00061923 /* render.c */,
 				DCCC776A1C2A9B7C00061923 /* render.h */,
+				DCCC77681C2A9B7C00061923 /* main.c */,
+				DCCC77661C2A9B7C00061923 /* glh.c */,
+				DCCC77641C2A9B7C00061923 /* gl_fluid.c */,
+				DCCC77691C2A9B7C00061923 /* render.c */,
 			);
 			path = demo;
 			sourceTree = "<group>";
@@ -121,9 +117,7 @@
 			isa = PBXGroup;
 			children = (
 				DCCC775A1C2A9B6A00061923 /* common.h */,
-				DCCC775B1C2A9B6A00061923 /* domain.c */,
 				DCCC775C1C2A9B6A00061923 /* fluid.c */,
-				DCCC775D1C2A9B6A00061923 /* grid.c */,
 				DCCC775E1C2A9B6A00061923 /* update_fluid.c */,
 			);
 			name = mz;
@@ -204,10 +198,8 @@
 				DCCC77601C2A9B6A00061923 /* fluid.c in Sources */,
 				DCCC776E1C2A9B7C00061923 /* render.c in Sources */,
 				DCCC77621C2A9B6A00061923 /* update_fluid.c in Sources */,
-				DCCC77611C2A9B6A00061923 /* grid.c in Sources */,
 				DCCC776C1C2A9B7C00061923 /* glh.c in Sources */,
 				DCCC776B1C2A9B7C00061923 /* gl_fluid.c in Sources */,
-				DCCC775F1C2A9B6A00061923 /* domain.c in Sources */,
 				DCCC776D1C2A9B7C00061923 /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
